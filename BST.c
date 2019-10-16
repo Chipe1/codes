@@ -1,164 +1,144 @@
 //requires stdlib.h
 
 typedef struct __BST{
-	int val,h,count,w;
-	struct __BST *left,*right;
+  int v; // value. replace with required data type and modify CoMParisions
+  int h, c, w; // height, count, weight
+  struct __BST *l, *r;
 }BST;
 
-void BST_insert(BST **,int);
+void BST_insert(BST **, int);
 void BST_update(BST **);
 int BST_geth(BST *);
 int BST_getw(BST *);
 void BST_fixit(BST **);
-void BST_rotl(BST **);
-void BST_rotr(BST **);
-BST * BST_search(BST *,int);
-void BST_delete(BST **,int);
-int BST_lessthan(BST *,int);
+void BST_liftr(BST **);
+void BST_liftl(BST **);
+BST * BST_search(BST *, int);
+void BST_delete(BST **, int);
+int BST_lessthan(BST *, int);
 
-void BST_insert(BST **tarp,int val){
-	BST *target=*tarp;
-	if(target==NULL){
-		target=(BST *)malloc(sizeof(BST));
-		target->val=val;
-		target->h=0;
-		target->left=NULL;target->right=NULL;
-		target->count=1;
-		target->w=1;
-		*tarp=target;
-		return ;
-	}
-	if(target->val==val){
-		target->count++;
-		target->w++;
-	}
-	else if(target->val>val){
-		BST_insert(&(target->left),val);
-	}
-	else{
-		BST_insert(&(target->right),val);
-	}
-	BST_update(tarp);
+void BST_insert(BST **tarp, int v){
+  BST *t = *tarp;
+  if(t == NULL){
+    t=(BST *)malloc(sizeof(BST));
+    t->v = v;
+    t->h = 0;
+    t->l = t->r = NULL;
+    t->c = 1;
+    t->w = 1;
+    *tarp=t;
+    return ;
+  }
+  if(t->v == v){ // cmp
+    t->c++;
+  }
+  else if(t->v > v){ //cmp
+    BST_insert(&(t->l),v);
+  }
+  else{
+    BST_insert(&(t->r),v);
+  }
+  BST_update(tarp);
 }
 
 void BST_update(BST **tarp){
-	BST *target=*tarp;
-	int lh,rh;
-	if(target==NULL){
-		return ;
-	}
-	target->w=BST_getw(target->left)+BST_getw(target->right)+target->count;
-	lh=BST_geth(target->left);rh=BST_geth(target->right);
-	if(lh>rh)
-		target->h=lh+1;
-	else
-		target->h=rh+1;
-	if(lh>rh+1||rh>lh+1)
-		BST_fixit(tarp);
+  if(t == NULL)return ;
+  BST *t = *tarp;
+  int lh, rh; // left&right height
+  t->w = BST_getw(t->l) + BST_getw(t->r) + t->c;
+  lh = BST_geth(t->l);
+  rh = BST_geth(t->r);
+  int mnh, mxh; // min&max of lh,rh
+  mnh = lh < rh ? lh : rh;
+  mxh = mnh^lh^rh;
+  t->h = mxh + 1;
+  
+  if(mxh > mnh + 1) BST_fixit(tarp);
 }
 
-int BST_getw(BST *target){
-	if(target==NULL)
-		return 0;
-	return target->w;
+int BST_getw(BST *t){
+  if(t == NULL) return 0;
+  return t->w;
 }
 
-int BST_geth(BST *target){
-	if(target==NULL)
-		return -1;
-	return target->h;
+int BST_geth(BST *t){
+  if(t == NULL) return -1;
+  return t->h;
 }
 
 void BST_fixit(BST **tarp){
-	BST *target=*tarp;
-	if(BST_geth(target->left)>BST_geth(target->right)){
-		if(BST_geth(target->left->left)>BST_geth(target->left->right)){
-			BST_rotr(tarp);
-			BST_update(&((*tarp)->right));
-			BST_update(tarp);
-		}
-		else{
-			BST_rotl(&(target->left));
-			BST_rotr(tarp);
-			target=*tarp;
-			BST_update(&(target->left));
-			BST_update(&(target->right));
-			BST_update(tarp);
-		}
-	}
-	else{
-		if(BST_geth(target->right->right)>BST_geth(target->right->left)){
-			BST_rotl(tarp);
-			BST_update(&((*tarp)->left));
-			BST_update(tarp);
-		}
-		else{
-			BST_rotr(&(target->right));
-			BST_rotl(tarp);
-			target=*tarp;
-			BST_update(&(target->right));
-			BST_update(&(target->left));
-			BST_update(tarp);
-		}		
-	}
+  BST *t = *tarp;
+  if(BST_geth(t->l) > BST_geth(t->r)){
+    if(BST_geth(t->l->l) > BST_geth(t->l->r)){
+      BST_liftl(tarp);
+      BST_update(&((*tarp)->r));
+      BST_update(tarp);
+    }
+    else{
+      BST_liftr(&(target->left));
+      BST_liftl(tarp);
+      target=*tarp;
+      BST_update(&(target->left));
+      BST_update(&(target->right));
+      BST_update(tarp);
+    }
+  }
+  else{
+    if(BST_geth(target->right->right)>BST_geth(target->right->left)){
+      BST_liftr(tarp);
+      BST_update(&((*tarp)->left));
+      BST_update(tarp);
+    }
+    else{
+      BST_liftl(&(target->right));
+      BST_liftr(tarp);
+      target=*tarp;
+      BST_update(&(target->right));
+      BST_update(&(target->left));
+      BST_update(tarp);
+    }		
+  }
 }
 
-void BST_rotl(BST **tarp){
-	BST *r,*target;
-	target=*tarp;r=target->right;
-	*tarp=r;
-	target->right=r->left;
-	r->left=target;
+void BST_liftr(BST **tarp){
+  BST *r, *t;
+  t = *tarp;r = t->r;
+  *tarp = r;
+  t->r = r->l;
+  r->l = t;
 }
 
-void BST_rotr(BST **tarp){
-	BST *l,*target;
-	target=*tarp;l=target->left;
-	*tarp=l;
-	target->left=l->right;
-	l->right=target;
+void BST_liftl(BST **tarp){
+  BST *l, *t;
+  t = *tarp;l = t->l;
+  *tarp = l;
+  t->l = l->r;
+  l->r = t;
 }
 
-BST * BST_search(BST *target,int val){
-	if(target==NULL)
-		return NULL;
-	if(target->val==val)
-		return target;
-	else if(target->val>val){
-		return BST_search(target->left,val);
-	}
-	else{
-		return BST_search(target->right,val);
-	}
+BST * BST_search(BST *t, int v){
+  if(t == NULL) return NULL;
+  if(t->v == v) return t; // cmp
+  else if(t->v > v) return BST_search(t->l, v); // cmp
+  else return BST_search(t->r, v);
 }
 
-void BST_delete(BST **tarp,int val){
-	BST *target;
-	if(tarp==NULL)
-		return ;
-	target=*tarp;
-	if(target->val==val){
-		if(target->count>0){
-			target->count--;
-			target->w--;
-		}
-	}
-	else if(target->val>val){
-		BST_insert(&(target->left),val);
-	}
-	else{
-		BST_insert(&(target->right),val);
-	}
-	BST_update(tarp);
+void BST_delete(BST *t,int v){
+  if(t == NULL) return ;
+  
+  if(t->v == v){
+    if(t->c > 0){
+      target->c--;
+    }
+  }
+  else if(t->v > v) BST_delete(t->l, v);
+  else BST_delete(t->r, v);
+  
+  BST_update(&t); // only w will be updated. no rotations
 }
 
-int BST_lessthan(BST *target,int val){
-	if(target==NULL)
-		return 0;
-	if(target->val>=val){
-		return BST_lessthan(target->left,val);
-	}
-	else{
-		return BST_lessthan(target->right,val)+target->w+BST_getw(target->left);
-	}
+int BST_lessthan(BST *t, int v){
+  if(t == NULL) return 0;
+  if(t->v >= v) return BST_lessthan(t->l, v); // cmp
+  else return BST_lessthan(t->r, v) + t->c + BST_getw(t->l); // cmp
 }
